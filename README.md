@@ -1,19 +1,41 @@
-# QA Automation Project — Version 1
+QA Automation Project — Version 1
+A production‑style Flask REST API with a SQLite backend, full CRUD operations, and a Pytest automation suite with CI/CD via GitHub Actions.
+Designed as a real‑world QA engineering portfolio project demonstrating API testing, service‑layer validation, and automated reporting.
 
-A Flask REST API with SQLite backend, full CRUD operations, and Pytest automation suite.
+📛 Badges
+https://img.shields.io/badge/Python-3.12+-blue  
+https://img.shields.io/badge/Flask-3.x-lightgrey  
+https://img.shields.io/badge/Tests-Pytest-green  
+https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-blue
 
-## Stack
-- Python 3.12+
-- Flask 3.x (REST API)
-- SQLite (database)
-- Pytest + pytest-html (test runner + reports)
-- GitHub Actions (CI/CD)
+📌 Tech Stack
+Python 3.12+
 
-## Setup
+Flask 3.x — REST API framework
 
-```bash
+SQLite — lightweight relational DB
+
+Pytest + pytest‑html — automated test suite + HTML reports
+
+GitHub Actions — CI pipeline for automated test execution
+
+📐 Architecture Overview
+Code
+Client → Flask Routes → Service Layer → SQLite Database
+                     ↑
+                Pytest Suite
+Routes handle HTTP requests
+
+Services contain business logic
+
+Database stores test cases + defects
+
+Pytest validates both API and service layer
+
+⚙️ Setup Instructions
+bash
 # Clone the repo
-git clone <your-repo-url>
+git clone https://github.com/highW/qa_automation_project.git
 cd qa_automation_project
 
 # Install dependencies
@@ -21,27 +43,44 @@ pip install -r requirements.txt
 
 # Run the API server
 python -m app.main
-```
+API runs at:
+👉 http://localhost:5000
 
-The API will be available at `http://localhost:5000`
+🗄️ Environment Variables (Optional)
+Create .env if needed:
 
-## API Endpoints
+Code
+FLASK_ENV=development
+DATABASE_URL=sqlite:///testcases.db
+🧩 API Endpoints
+Method	Endpoint	Description
+GET	/health	Health check
+GET	/testcases	List all test cases
+POST	/testcases	Create a test case
+GET	/testcases/:id	Get a test case
+PUT	/testcases/:id	Update a test case
+DELETE	/testcases/:id	Delete a test case
+POST	/testcases/:id/defects	Create a defect
+GET	/testcases/:id/defects	List defects for case
+GET	/defects	List all defects
 
-| Method | Endpoint                          | Description            |
-|--------|-----------------------------------|------------------------|
-| GET    | /health                           | Health check           |
-| GET    | /testcases                        | List all test cases    |
-| POST   | /testcases                        | Create a test case     |
-| GET    | /testcases/:id                    | Get a test case        |
-| PUT    | /testcases/:id                    | Update a test case     |
-| DELETE | /testcases/:id                    | Delete a test case     |
-| POST   | /testcases/:id/defects            | Create a defect        |
-| GET    | /testcases/:id/defects            | List defects for case  |
-| GET    | /defects                          | List all defects       |
 
-## Running Tests
-
-```bash
+📦 Example JSON Payloads
+Create Test Case
+json
+{
+  "title": "Login Test",
+  "description": "Verify user login",
+  "priority": "High"
+}
+Create Defect
+json
+{
+  "defect_title": "Login button unresponsive",
+  "severity": "Major"
+}
+🧪 Running Tests
+bash
 # Run all tests
 pytest -v
 
@@ -50,28 +89,64 @@ pytest --html=report.html --self-contained-html -v
 
 # Run specific test file
 pytest tests/test_api.py -v
-```
+🧱 Database Schema
+Test Cases Table
+Field	Type
+id	INTEGER
+title	TEXT
+description	TEXT
+priority	TEXT
 
-## Example Usage
 
-```bash
-# Create a test case
-curl -X POST http://localhost:5000/testcases \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Login Test", "description": "Verify user login", "priority": "High"}'
+Defects Table
+Field	Type
+id	INTEGER
+testcase_id	INTEGER
+defect_title	TEXT
+severity	TEXT
 
-# List all test cases
-curl http://localhost:5000/testcases
 
-# Log a defect
-curl -X POST http://localhost:5000/testcases/1/defects \
-  -H "Content-Type: application/json" \
-  -d '{"defect_title": "Login button unresponsive", "severity": "Major"}'
-```
+🔍 Test Strategy
+This project includes:
 
-## Project Structure
+Unit Tests
+Validate service‑layer logic
 
-```
+Mock DB operations
+
+Ensure CRUD correctness
+
+Integration Tests
+Use Flask test client
+
+Validate full request → response flow
+
+Test error handling and edge cases
+
+Smoke Tests
+/health endpoint
+
+Basic CRUD sanity checks
+
+🚀 CI/CD Pipeline (GitHub Actions)
+The workflow:
+
+Installs dependencies
+
+Spins up Flask app
+
+Runs full Pytest suite
+
+Generates HTML report
+
+Fails PRs on test failure
+
+Located at:
+
+Code
+.github/workflows/qa.yml
+📂 Project Structure
+Code
 qa_automation_project/
 ├── app/
 │   ├── __init__.py
@@ -87,4 +162,35 @@ qa_automation_project/
 │   └── qa.yml           # GitHub Actions CI
 ├── requirements.txt
 └── README.md
-```
+🛠️ Troubleshooting
+Port already in use
+Code
+OSError: [Errno 98] Address already in use
+Fix:
+
+Code
+killall python
+Database locked
+Delete the SQLite file:
+
+Code
+rm testcases.db
+📈 Roadmap
+[ ] Add JWT authentication
+
+[ ] Add pagination to endpoints
+
+[ ] Add Swagger/OpenAPI docs
+
+[ ] Add Dockerfile + docker-compose
+
+[ ] Add load tests (Locust or k6)
+
+[ ] Add test coverage badge
+
+🤝 Contributing
+PRs are welcome.
+Follow conventional commits and ensure all tests pass.
+
+📜 License
+MIT Licens
