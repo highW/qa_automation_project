@@ -8,7 +8,7 @@ Designed as a real‑world QA engineering portfolio project demonstrating API te
 ![SQLite](https://img.shields.io/badge/SQLite-Database-07405E?logo=sqlite&logoColor=white)
 ![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC?logo=pytest)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)
-blue
+
 
 📌 Tech Stack
 Python 3.12+
