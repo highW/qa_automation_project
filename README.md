@@ -3,10 +3,12 @@ A production‑style Flask REST API with a SQLite backend, full CRUD operations,
 Designed as a real‑world QA engineering portfolio project demonstrating API testing, service‑layer validation, and automated reporting.
 
 📛 Badges
-https://img.shields.io/badge/Python-3.12+-blue  
-https://img.shields.io/badge/Flask-3.x-lightgrey  
-https://img.shields.io/badge/Tests-Pytest-green  
-https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-blue
+![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)
+![SQLite](https://img.shields.io/badge/SQLite-Database-07405E?logo=sqlite&logoColor=white)
+![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC?logo=pytest)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)
+blue
 
 📌 Tech Stack
 Python 3.12+
