@@ -1,198 +1,183 @@
-QA Automation Project — Version 1
-A production‑style Flask REST API with a SQLite backend, full CRUD operations, and a Pytest automation suite with CI/CD via GitHub Actions.
-Designed as a real‑world QA engineering portfolio project demonstrating API testing, service‑layer validation, and automated reporting.
+# QA Automation Project
 
-📛 Badges
+> Production-style Flask REST API with SQLite, full CRUD, and a Pytest automation suite — built as a real-world QA engineering portfolio project.
+
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)
 ![SQLite](https://img.shields.io/badge/SQLite-Database-07405E?logo=sqlite&logoColor=white)
-![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC?logo=pytest)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)
+![Pytest](https://img.shields.io/badge/Pytest-22%20Tests-0A9EDC?logo=pytest)
+![CI](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)
 
+---
 
-📌 Tech Stack
-Python 3.12+
+## What This Is
 
-Flask 3.x — REST API framework
+A self-contained QA engineering portfolio project demonstrating:
 
-SQLite — lightweight relational DB
+- **API design** — RESTful Flask routes for test case and defect management
+- **Service-layer architecture** — business logic decoupled from routes and DB
+- **Automated testing** — 22 Pytest tests covering unit, integration, and edge cases
+- **CI/CD** — GitHub Actions pipeline with HTML report artifacts
 
-Pytest + pytest‑html — automated test suite + HTML reports
+---
 
-GitHub Actions — CI pipeline for automated test execution
+## Stack
 
-📐 Architecture Overview
-Code
-Client → Flask Routes → Service Layer → SQLite Database
-                     ↑
-                Pytest Suite
-Routes handle HTTP requests
+| Layer | Technology |
+|---|---|
+| API | Flask 3.x |
+| Database | SQLite via `sqlite3` context manager |
+| Testing | Pytest + pytest-html |
+| CI/CD | GitHub Actions |
+| Language | Python 3.12+ |
 
-Services contain business logic
+---
 
-Database stores test cases + defects
+## Architecture
 
-Pytest validates both API and service layer
+```
+Client
+  └── Flask Routes (main.py)
+        └── Service Layer (services.py)
+              └── SQLite Database (database.py)
 
-⚙️ Setup Instructions
-bash
-# Clone the repo
+Pytest Suite
+  ├── test_api.py       → Integration tests via Flask test client
+  └── test_services.py  → Unit tests for service layer
+```
+
+---
+
+## Setup
+
+```bash
 git clone https://github.com/highW/qa_automation_project.git
 cd qa_automation_project
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Run the API server
 python -m app.main
-API runs at:
-👉 http://localhost:5000
+```
 
-🗄️ Environment Variables (Optional)
-Create .env if needed:
+API runs at `http://localhost:5000`
 
-Code
-FLASK_ENV=development
-DATABASE_URL=sqlite:///testcases.db
-🧩 API Endpoints
-Method	Endpoint	Description
-GET	/health	Health check
-GET	/testcases	List all test cases
-POST	/testcases	Create a test case
-GET	/testcases/:id	Get a test case
-PUT	/testcases/:id	Update a test case
-DELETE	/testcases/:id	Delete a test case
-POST	/testcases/:id/defects	Create a defect
-GET	/testcases/:id/defects	List defects for case
-GET	/defects	List all defects
+---
 
+## API Reference
 
-📦 Example JSON Payloads
-Create Test Case
-json
+### Test Cases
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Health check |
+| `GET` | `/testcases` | List all test cases |
+| `POST` | `/testcases` | Create a test case |
+| `GET` | `/testcases/:id` | Get a test case |
+| `PUT` | `/testcases/:id` | Update a test case |
+| `DELETE` | `/testcases/:id` | Delete a test case |
+
+### Defects
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/testcases/:id/defects` | Create a defect |
+| `GET` | `/testcases/:id/defects` | List defects for a case |
+| `GET` | `/defects` | List all defects |
+
+### Payloads
+
+**Create test case**
+```json
 {
   "title": "Login Test",
-  "description": "Verify user login",
+  "description": "Verify user login flow",
   "priority": "High"
 }
-Create Defect
-json
+```
+
+**Create defect**
+```json
 {
   "defect_title": "Login button unresponsive",
   "severity": "Major"
 }
-🧪 Running Tests
-bash
-# Run all tests
+```
+
+---
+
+## Running Tests
+
+```bash
+# All tests
 pytest -v
 
-# Run with HTML report
+# With HTML report
 pytest --html=report.html --self-contained-html -v
 
-# Run specific test file
+# Single file
 pytest tests/test_api.py -v
-🧱 Database Schema
-Test Cases Table
-Field	Type
-id	INTEGER
-title	TEXT
-description	TEXT
-priority	TEXT
+```
 
+**22/22 passing** — isolated per-test DB via `autouse` fixture, no shared state.
 
-Defects Table
-Field	Type
-id	INTEGER
-testcase_id	INTEGER
-defect_title	TEXT
-severity	TEXT
+---
 
+## Test Strategy
 
-🔍 Test Strategy
-This project includes:
+| Layer | File | Coverage |
+|---|---|---|
+| Unit | `test_services.py` | CRUD logic, default values, cascade delete |
+| Integration | `test_api.py` | HTTP routes, status codes, error handling |
 
-Unit Tests
-Validate service‑layer logic
+Each test runs against a fresh SQLite database — created and destroyed per test via `conftest.py`.
 
-Mock DB operations
+---
 
-Ensure CRUD correctness
+## Project Structure
 
-Integration Tests
-Use Flask test client
-
-Validate full request → response flow
-
-Test error handling and edge cases
-
-Smoke Tests
-/health endpoint
-
-Basic CRUD sanity checks
-
-🚀 CI/CD Pipeline (GitHub Actions)
-The workflow:
-
-Installs dependencies
-
-Spins up Flask app
-
-Runs full Pytest suite
-
-Generates HTML report
-
-Fails PRs on test failure
-
-Located at:
-
-Code
-.github/workflows/qa.yml
-📂 Project Structure
-Code
+```
 qa_automation_project/
 ├── app/
-│   ├── __init__.py
-│   ├── database.py      # DB connection context manager
-│   ├── models.py        # SQL schema
-│   ├── services.py      # Business logic / CRUD
-│   └── main.py          # Flask routes
+│   ├── database.py       # DB connection context manager
+│   ├── models.py         # SQL schema
+│   ├── services.py       # Business logic / CRUD
+│   └── main.py           # Flask routes
 ├── tests/
-│   ├── conftest.py      # Fixtures (isolated test DB)
-│   ├── test_services.py # Unit tests for service layer
-│   └── test_api.py      # Integration tests via Flask test client
+│   ├── conftest.py       # Fixtures — isolated test DB per test
+│   ├── test_services.py  # Unit tests
+│   └── test_api.py       # Integration tests
 ├── .github/workflows/
-│   └── qa.yml           # GitHub Actions CI
+│   └── qa.yml            # CI pipeline
 ├── requirements.txt
 └── README.md
-🛠️ Troubleshooting
-Port already in use
-Code
-OSError: [Errno 98] Address already in use
-Fix:
+```
 
-Code
+---
+
+## Troubleshooting
+
+**Port already in use**
+```bash
 killall python
-Database locked
-Delete the SQLite file:
+```
 
-Code
-rm testcases.db
-📈 Roadmap
-[ ] Add JWT authentication
+**Database locked**
+```bash
+rm qa.db
+```
 
-[ ] Add pagination to endpoints
+---
 
-[ ] Add Swagger/OpenAPI docs
+## Roadmap
 
-[ ] Add Dockerfile + docker-compose
+- [ ] Input validation — enforce allowed values for `priority` and `severity`
+- [ ] JWT authentication
+- [ ] Pagination on list endpoints
+- [ ] Swagger / OpenAPI docs
+- [ ] Dockerfile + docker-compose
+- [ ] Load tests (k6)
+- [ ] Test coverage badge
 
-[ ] Add load tests (Locust or k6)
+---
 
-[ ] Add test coverage badge
+## License
 
-🤝 Contributing
-PRs are welcome.
-Follow conventional commits and ensure all tests pass.
-
-📜 License
-MIT Licens
+MIT
