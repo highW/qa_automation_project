@@ -1,4 +1,4 @@
-# QA Automation Project
+e# QA Automation Project
 
 > Production-style Flask REST API with SQLite, JWT authentication, pagination, full CRUD, and a Pytest automation suite — built as a real-world QA engineering portfolio project.
 
@@ -256,6 +256,15 @@ qa_automation_project/
 ---
 
 ## Troubleshooting
+
+**Windows curl issues**
+
+PowerShell's `curl` is actually `Invoke-WebRequest` and doesn't support `-X`, `-H`, or `-d` flags. Use the `$body` variable approach:
+```powershell
+$body = '{"username":"yourMan","password":"your_password"}'
+curl.exe -X POST http://localhost:5000/login -H "Content-Type: application/json" -d $body
+```
+If you still get JSON errors, use the Python one-liner instead — see the Authentication section.
 
 **Port already in use**
 ```bash
