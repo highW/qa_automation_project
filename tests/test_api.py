@@ -28,13 +28,24 @@ class TestTestCasesAPI:
             content_type='application/json')
         assert res.status_code == 400
 
-    def test_list_test_cases(self, client):
+    def test_list_test_cases_returns_envelope(self, client):
         client.post('/testcases',
             data=json.dumps({'title': 'List Test', 'priority': 'Low'}),
             content_type='application/json')
         res = client.get('/testcases')
         assert res.status_code == 200
-        assert isinstance(res.get_json(), list)
+        body = res.get_json()
+        assert 'data' in body
+        assert 'metadata' in body
+        assert isinstance(body['data'], list)
+
+    def test_list_test_cases_metadata_fields(self, client):
+        res = client.get('/testcases')
+        meta = res.get_json()['metadata']
+        assert 'current_page' in meta
+        assert 'per_page' in meta
+        assert 'total_records' in meta
+        assert 'total_pages' in meta
 
     def test_get_single_test_case(self, client):
         post = client.post('/testcases',
@@ -66,6 +77,54 @@ class TestTestCasesAPI:
         tc_id = post.get_json()['id']
         res = client.delete(f'/testcases/{tc_id}')
         assert res.status_code == 200
+
+class TestPaginationAPI:
+    def test_default_page_and_per_page(self, client):
+        res = client.get('/testcases')
+        meta = res.get_json()['metadata']
+        assert meta['current_page'] == 1
+        assert meta['per_page'] == 20
+
+    def test_custom_page_and_per_page(self, client):
+        res = client.get('/testcases?page=1&per_page=5')
+        assert res.status_code == 200
+        meta = res.get_json()['metadata']
+        assert meta['per_page'] == 5
+
+    def test_invalid_page_param_returns_400(self, client):
+        res = client.get('/testcases?page=abc')
+        assert res.status_code == 400
+
+    def test_invalid_per_page_param_returns_400(self, client):
+        res = client.get('/testcases?per_page=xyz')
+        assert res.status_code == 400
+
+    def test_per_page_above_max_resets_to_default(self, client):
+        res = client.get('/testcases?per_page=999')
+        assert res.status_code == 200
+        assert res.get_json()['metadata']['per_page'] == 20
+
+    def test_page_out_of_range_returns_404(self, client):
+        # no records exist, page 2 should be out of range
+        client.post('/testcases',
+            data=json.dumps({'title': 'Only One', 'priority': 'Low'}),
+            content_type='application/json')
+        res = client.get('/testcases?page=999&per_page=20')
+        assert res.status_code == 404
+
+    def test_empty_db_returns_empty_data(self, client):
+        res = client.get('/testcases')
+        body = res.get_json()
+        assert body['data'] == []
+        assert body['metadata']['total_records'] == 0
+
+    def test_data_count_matches_per_page(self, client):
+        for i in range(5):
+            client.post('/testcases',
+                data=json.dumps({'title': f'TC{i}', 'priority': 'Low'}),
+                content_type='application/json')
+        res = client.get('/testcases?page=1&per_page=3')
+        assert len(res.get_json()['data']) == 3
 
 class TestDefectsAPI:
     def test_create_defect(self, client):

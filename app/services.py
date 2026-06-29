@@ -14,10 +14,18 @@ def create_test_case(title, description, priority):
         )
         conn.commit()
         return cur.lastrowid
-
-def get_test_cases():
+    
+def get_test_cases_paginated(limit=20, offset=0):
     with get_connection() as conn:
-        return [dict(r) for r in conn.execute('SELECT * FROM test_cases')]
+        # Use SQL LIMIT and OFFSET to fetch only a slice of data
+        query = 'SELECT * FROM test_cases LIMIT ? OFFSET ?'
+        rows = conn.execute(query, (limit, offset)).fetchall()
+        return [dict(r) for r in rows]
+
+def get_test_cases_count():
+    with get_connection() as conn:
+        row = conn.execute('SELECT COUNT(*) as total FROM test_cases').fetchone()
+        return row['total'] if row else 0
 
 def get_test_case(tc_id):
     with get_connection() as conn:

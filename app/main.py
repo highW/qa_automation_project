@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from app.services import (
-    init_db, create_test_case, get_test_cases, get_test_case,
+    init_db, create_test_case, get_test_cases_paginated, get_test_cases_count, get_test_case,
     update_test_case, delete_test_case, create_defect, get_defects
 )
 
@@ -23,7 +23,33 @@ def add_case():
 
 @app.get('/testcases')
 def list_cases():
-    return jsonify(get_test_cases())
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+    except ValueError:
+        return jsonify(error='page and per_page must be integers'), 400
+
+    if page < 1:
+        page = 1
+    if per_page < 1 or per_page > 100:
+        per_page = 20
+
+    offset = (page - 1) * per_page
+    total = get_test_cases_count()
+    total_pages = (total + per_page - 1) // per_page
+
+    if page > total_pages and total_pages > 0:
+        return jsonify(error='Page out of range'), 404
+
+    return jsonify({
+        "data": get_test_cases_paginated(limit=per_page, offset=offset),
+        "metadata": {
+            "current_page": page,
+            "per_page": per_page,
+            "total_records": total,
+            "total_pages": total_pages
+        }
+    })
 
 @app.get('/testcases/<int:tc_id>')
 def get_case(tc_id):
