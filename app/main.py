@@ -1,19 +1,37 @@
 from flask import Flask, request, jsonify
+from app.auth import token_required, generate_token, ADMIN_USERNAME, ADMIN_PASSWORD
 from app.services import (
-    init_db, create_test_case, get_test_cases_paginated, get_test_cases_count, get_test_case,
-    update_test_case, delete_test_case, create_defect, get_defects
+    init_db, create_test_case, get_test_cases_paginated, get_test_cases_count,
+    get_test_case, update_test_case, delete_test_case, create_defect, get_defects
 )
 
 app = Flask(__name__)
 init_db()
 
+# --- Health ---
+
 @app.get('/health')
 def health():
     return jsonify(status='OK', message='QA Automation API is running')
 
+# --- Authentication ---
+
+@app.post('/login')
+def login():
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify(error='Username and password required'), 400
+
+    if data['username'] == ADMIN_USERNAME and data['password'] == ADMIN_PASSWORD:
+        token = generate_token(data['username'])
+        return jsonify(token=token)
+
+    return jsonify(error='Invalid credentials'), 401
+
 # --- Test Cases ---
 
 @app.post('/testcases')
+@token_required
 def add_case():
     data = request.get_json()
     if not data or not data.get('title') or not data.get('priority'):
@@ -42,12 +60,12 @@ def list_cases():
         return jsonify(error='Page out of range'), 404
 
     return jsonify({
-        "data": get_test_cases_paginated(limit=per_page, offset=offset),
-        "metadata": {
-            "current_page": page,
-            "per_page": per_page,
-            "total_records": total,
-            "total_pages": total_pages
+        'data': get_test_cases_paginated(limit=per_page, offset=offset),
+        'metadata': {
+            'current_page': page,
+            'per_page': per_page,
+            'total_records': total,
+            'total_pages': total_pages
         }
     })
 
@@ -59,6 +77,7 @@ def get_case(tc_id):
     return jsonify(tc)
 
 @app.put('/testcases/<int:tc_id>')
+@token_required
 def update_case(tc_id):
     data = request.get_json()
     allowed = {k: v for k, v in data.items() if k in ('title', 'description', 'priority', 'status')}
@@ -68,6 +87,7 @@ def update_case(tc_id):
     return jsonify(message='Updated')
 
 @app.delete('/testcases/<int:tc_id>')
+@token_required
 def delete_case(tc_id):
     delete_test_case(tc_id)
     return jsonify(message='Deleted')
@@ -75,6 +95,7 @@ def delete_case(tc_id):
 # --- Defects ---
 
 @app.post('/testcases/<int:tc_id>/defects')
+@token_required
 def add_defect(tc_id):
     data = request.get_json()
     if not data or not data.get('defect_title') or not data.get('severity'):
